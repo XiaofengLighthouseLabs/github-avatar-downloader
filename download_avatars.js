@@ -1,6 +1,8 @@
 var request = require('request');
-
 var fs = require('fs');
+var dotenv = require('dotenv').config();
+
+
 console.log('Welcome to the GitHub Avatar Downloader!');
 
 // use avatar URL as input, output to  local file path
@@ -32,8 +34,11 @@ function downloadImageByURL(url, filePath) {
 // get list of repo contributors and call download Image By URL on each
 
 function getRepoContributors(repoOwner, repoName, cb) {
+  var GITHUB_USER = process.env.GITHUB_USER;
+  var GITHUB_TOKEN = process.env.GITHUB_ACCESS_TOKEN;
 
-  var requestURL = "https://api.github.com/repos/" + repoOwner + "/" + repoName + "/contributors";
+  // var requestURL = "https://api.github.com/repos/" + repoOwner + "/" + repoName + "/contributors";
+  var requestURL = 'https://'+ GITHUB_USER + ':' + GITHUB_TOKEN + '@api.github.com/repos/' + repoOwner + '/' + repoName + '/contributors';
   var requestOptions = {
 
     headers: {
