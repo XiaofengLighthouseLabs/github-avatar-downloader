@@ -1,8 +1,6 @@
 var request = require('request');
+
 var fs = require('fs');
-
-
-
 console.log('Welcome to the GitHub Avatar Downloader!');
 
 // use avatar URL as input, output to  local file path
@@ -12,11 +10,11 @@ var repoName = process.argv[3];
 
 function downloadImageByURL(url, filePath) {
 
-  request.get(url)               // Note 1
-       .on('error', function (err) {                                   // Note 2
+  request.get(url)
+       .on('error', function (err) {
          throw err;
        })
-       .on('response', function (response) {                           // Note 3
+       .on('response', function (response) {
          console.log('Response Status Code: ', response.statusCode);
          console.log('Response statusMessage: ', response.statusMessage);
          console.log('Response headers: ', response.headers['content-type']);
@@ -28,7 +26,6 @@ function downloadImageByURL(url, filePath) {
          console.log ('Download complete.');
        })
        .pipe(fs.createWriteStream(filePath));
-// ...
 }
 
 
@@ -48,28 +45,26 @@ function getRepoContributors(repoOwner, repoName, cb) {
 
     cb(err, res, body)
 
-    });
+  });
 
+}
+
+function callback (err, res, body){
+  if (err) {
+    throw err;
   }
 
-  function callback (err, res, body){
-   if (err) {
-      throw err;
-    }
-
-    var data = JSON.parse(body);
-    data.forEach(function(user){
-        console.log("Avatar URL for " + user.login + ": " + user.avatar_url);
-        downloadImageByURL(user.avatar_url, './avatars/' + user.login + '.png');
+  var data = JSON.parse(body);
+  data.forEach(function(user){
+       console.log("Avatar URL for " + user.login + ": " + user.avatar_url);
+       downloadImageByURL(user.avatar_url, './avatars/' + user.login + '.png');
     });
   }
 
 
 
-  getRepoContributors(repoName, repoOwner, callback);
+getRepoContributors(repoName, repoOwner, callback);
 
 
-  // console.log("Errors:", err);
-  // console.log("Result:", result);
-// });
+
 
