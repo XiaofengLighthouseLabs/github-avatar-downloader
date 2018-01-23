@@ -7,7 +7,11 @@ console.log('Welcome to the GitHub Avatar Downloader!');
 
 // use avatar URL as input, output to  local file path
 
+var repoOwner = process.argv[2];
+var repoName = process.argv[3];
+
 function downloadImageByURL(url, filePath) {
+
   request.get(url)               // Note 1
        .on('error', function (err) {                                   // Note 2
          throw err;
@@ -31,22 +35,41 @@ function downloadImageByURL(url, filePath) {
 // get list of repo contributors and call download Image By URL on each
 
 function getRepoContributors(repoOwner, repoName, cb) {
-  var options = {
-    url: "https://api.github.com/repos/" + repoOwner + "/" + repoName + "/contributors",
+
+  var requestURL = "https://api.github.com/repos/" + repoOwner + "/" + repoName + "/contributors";
+  var requestOptions = {
+
     headers: {
       'User-Agent': 'request'
     }
   };
+  // passing in avatar_url from your callback function into downloadImageByURL
+  request(requestURL, requestOptions, function(err, res, body) {
 
-  request(options, function(err, res, body) {
-    cb(err, body);
-  });
-}
+    cb(err, res, body)
 
-getRepoContributors("jquery", "jquery", function(err, result) {
+    });
+
+  }
+
+  function callback (err, res, body){
+   if (err) {
+      throw err;
+    }
+
+    var data = JSON.parse(body);
+    data.forEach(function(user){
+        console.log("Avatar URL for " + user.login + ": " + user.avatar_url);
+        downloadImageByURL(user.avatar_url, './avatars/' + user.login + '.png');
+    });
+  }
 
 
-  console.log("Errors:", err);
-  console.log("Result:", result);
-});
+
+  getRepoContributors(repoName, repoOwner, callback);
+
+
+  // console.log("Errors:", err);
+  // console.log("Result:", result);
+// });
 
